@@ -1,0 +1,32 @@
+/* styles.css */
+.timer-score-container {
+    display: flex;
+    justify-content: center; /* Centrer les horloges */
+    align-items: center;
+    gap: 20px; /* Espacement entre les horloges */
+    margin-bottom: 20px;
+    font-family: 'Digital-7', sans-serif; /* Police d'horloge numérique */
+    color: #ff4757; /* Rouge foncé */
+    text-shadow: 0 0 10px #ff4757, 0 0 20px #ff4757; /* Effet néon */
+    padding: 0 20px; /* Espacement sur les côtés */
+  }
+  
+  .timer,
+  .score {
+    background-color: #2f3542; /* Gris foncé */
+    padding: 15px 25px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px #f8f9fa;
+    font-size: 36px;
+    letter-spacing: 2px; /* Espacement pour un effet numérique */
+  }
+  
+  .timer::before,
+  .score::before {
+    content: "🕒"; /* Icône d'horloge pour le temps */
+    margin-right: 10px;
+  }
+  
+  .score::before {
+    content: "🏆"; /* Icône de trophée pour le score */
+  }

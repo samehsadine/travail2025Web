@@ -112,3 +112,4 @@ const PileHorloge: React.FC<PileHorlogeProps> = ({ pile, indexPile, onClick, isC
 };
 
 export default PileHorloge;
+
