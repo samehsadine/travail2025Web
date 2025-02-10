@@ -1,4 +1,4 @@
-import { CarteH } from "./Types";
+/* import { CarteH } from "./Types";
 
 export interface Cartes {
     valeur: string;
@@ -41,4 +41,20 @@ export interface Cartes {
     },
   };
   
-  
+   */
+
+  // Deck.ts
+import { CarteH } from "./Types";
+
+export const Deck = {
+  async creerPaquet(): Promise<CarteH[]> {
+    const response = await fetch("https://deckofcardsapi.com/api/deck/new/draw/?count=52");
+    const data = await response.json();
+    return data.cards.map((card: any) => ({
+      code: card.code,
+      image: card.image,
+      faceVisible: false,
+      value: card.value,
+    }));
+  },
+};

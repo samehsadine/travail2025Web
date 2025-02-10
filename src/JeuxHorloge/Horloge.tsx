@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+/*import React, { useState, useEffect } from "react";
 import PileHorloge from "./PileHorloge";
 import { Deck } from "./Deck";
 import { EtatApp, CarteH, Pile } from "./Types";
@@ -102,7 +102,7 @@ const Horloge: React.FC = () => {
       cartesRevelees: [...ancienEtat.cartesRevelees, carte], // Ajouter la carte aux cartes révélées
     }));
   }; */
-  const deplacerCarte = () => {
+ /* const deplacerCarte = () => {
     
     setEtat((ancienEtat) => {
       
@@ -249,4 +249,165 @@ const Horloge: React.FC = () => {
   );
 };
 
-export default Horloge;
+export default Horloge;*/
+// Horloge.tsx
+import React, { useState, useEffect } from "react";
+import PileHorloge from "./PileHorloge";
+import { Deck } from "./Deck";
+import { CarteH, Pile, EtatPiles, EtatPaquet, EtatIndexCourant } from "./Types";
+import "bootstrap/dist/css/bootstrap.min.css";
+
+const Horloge: React.FC = () => {
+  // États séparés
+  const [etatPiles, setEtatPiles] = useState<EtatPiles>({
+    piles: Array(13).fill(null).map(() => ({ cartes: [] })), // 12 piles pour les heures + 1 pile centrale pour les rois
+  });
+
+  const [etatPaquet, setEtatPaquet] = useState<EtatPaquet>({
+    paquet: [], // Paquet vide
+  });
+
+  const [etatIndexCourant, setEtatIndexCourant] = useState<EtatIndexCourant>({
+    indexCourant: -1, // Aucune pile ciblée au départ
+  });
+
+  useEffect(() => {
+    const initialiserJeu = async () => {
+      const nouveauPaquet = await Deck.creerPaquet();
+      distribuerCartes(nouveauPaquet);
+    };
+
+    initialiserJeu();
+  }, []);
+
+  const distribuerCartes = (paquet: CarteH[]) => {
+    // Mélanger le paquet
+    const paquetMelange = [...paquet].sort(() => Math.random() - 0.5);
+  
+    // Distribuer les cartes dans les 13 piles
+    const nouvellesPiles = Array(13).fill(null).map(() => ({ cartes: [] as CarteH[] }));
+    let indexCarte = 0;
+  
+    for (let i = 0; i < 4; i++) {
+      for (let j = 0; j < 13; j++) {
+        nouvellesPiles[j].cartes.push({
+          ...paquetMelange[indexCarte],
+          faceVisible: false, // Toutes les cartes commencent face cachée
+        });
+        indexCarte++;
+      }
+    }
+  
+    // Révéler la carte du dessus de la pile centrale
+    if (nouvellesPiles[0].cartes.length > 0) {
+      nouvellesPiles[0].cartes[nouvellesPiles[0].cartes.length - 1].faceVisible = true;
+    }
+  
+    // Mettre à jour les états
+    setEtatPiles({ piles: nouvellesPiles });
+    setEtatPaquet({ paquet: paquetMelange });
+    setEtatIndexCourant({ indexCourant: 0 }); // Commencer par la pile centrale
+  };
+
+  const deplacerCarte = () => {
+    const nouvellesPiles = [...etatPiles.piles];
+    const indexPileSource = etatIndexCourant.indexCourant;
+    const pileSource = nouvellesPiles[indexPileSource];
+  
+    // Vérifier si la pile source est vide
+    if (pileSource.cartes.length === 0) {
+      console.log("La pile est vide !");
+      return;
+    }
+  
+    // Récupérer la carte du dessus de la pile source
+    const carteADeplacer = pileSource.cartes[pileSource.cartes.length - 1];
+  
+    // Vérifier si la carte est face visible
+    if (!carteADeplacer.faceVisible) {
+      console.log("La carte est face cachée !");
+      return;
+    }
+  
+    // Retirer la carte du dessus de la pile source
+    pileSource.cartes.pop();
+  
+    // Trouver la pile de destination en fonction de la valeur de la carte
+    const indexPileDestination = obtenirPileCorrespondante(carteADeplacer);
+  
+    if (indexPileDestination === -1) {
+      console.log("Erreur : Impossible de trouver la pile correspondante !");
+      return;
+    }
+  
+    // Ajouter la carte à la pile de destination et la rendre visible
+    nouvellesPiles[indexPileDestination].cartes.unshift({
+      ...carteADeplacer,
+      faceVisible: true,
+    });
+  
+    // Révéler la nouvelle carte du dessus de la pile source
+    if (pileSource.cartes.length > 0) {
+      pileSource.cartes[pileSource.cartes.length - 1].faceVisible = true;
+    }
+  
+    // Mettre à jour les états
+    setEtatPiles({ piles: nouvellesPiles });
+    setEtatIndexCourant({ indexCourant: indexPileDestination }); // Mettre à jour l'index courant
+  };
+  const obtenirPileCorrespondante = (carte: CarteH) => {
+    const rangs: { [key: string]: number } = {
+      "2": 2,
+      "3": 3,
+      "4": 4,
+      "5": 5,
+      "6": 6,
+      "7": 7,
+      "8": 8,
+      "9": 9,
+      "10": 10,
+      "JACK": 11,
+      "QUEEN": 12,
+      "KING": 0, // Les rois vont au centre (pile 0)
+      "ACE": 1,
+    };
+    return rangs[carte.value] ?? -1;
+  };
+  return (
+    <div className="container text-center mt-5">
+      <h1>Clock Solitaire</h1>
+      <div
+        className="position-relative"
+        style={{ width: "500px", height: "500px", margin: "0 auto" }}
+      >
+        {etatPiles.piles.map((pile, index) => {
+          const angle = ((index - 3) * 30) * (Math.PI / 180);
+          const radius = index === 0 ? 0 : 180; // La pile centrale (0) est au centre
+          const x = 250 + radius * Math.cos(angle);
+          const y = 250 + radius * Math.sin(angle);
+
+          return (
+            <div
+              key={index}
+              className="position-absolute"
+              style={{
+                left: `${x}px`,
+                top: `${y}px`,
+                transform: "translate(-50%, -50%)",
+              }}
+            >
+              <PileHorloge
+                pile={pile.cartes}
+                indexPile={index}
+                onClick={() => deplacerCarte()}
+                isCentrale={index === 0}
+              />
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
+export default Horloge;/*  */

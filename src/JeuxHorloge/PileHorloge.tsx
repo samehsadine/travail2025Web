@@ -1,4 +1,4 @@
-// PileHorloge.tsx
+/* // PileHorloge.tsx
 /* import React from "react";
 import { CarteH } from "./Types";
 
@@ -53,7 +53,8 @@ export default PileHorloge; */
 
 // export default PileHorloge;
 
-import React from "react";
+/*import React from "react";
+
 import { CarteH } from "./Types";
 
 interface PileHorlogeProps {
@@ -75,6 +76,35 @@ const PileHorloge: React.FC<PileHorlogeProps> = ({ pile, indexPile, deplacerCart
           alt="Carte"
           style={{ cursor: "pointer", width: "50px", height: "70px" }} // Correction du style inline
           onClick={() => deplacerCarte(pile[pile.length - 1], indexPile)} // Correction de l'événement clic
+        />
+      )}
+    </div>
+  );
+};
+
+export default PileHorloge; */
+
+// PileHorloge.tsx
+import React from "react";
+import { CarteH } from "./Types";
+
+interface PileHorlogeProps {
+  pile: CarteH[];
+  indexPile: number;
+  onClick: () => void;
+  isCentrale: boolean;
+}
+
+const PileHorloge: React.FC<PileHorlogeProps> = ({ pile, indexPile, onClick, isCentrale }) => {
+  const carteDuDessus = pile.length > 0 ? pile[pile.length - 1] : null;
+
+  return (
+    <div className="pile" onClick={onClick}>
+      {carteDuDessus && (
+        <img
+          src={carteDuDessus.faceVisible ? `https://deckofcardsapi.com/static/img/${carteDuDessus.code}.png` : 'https://deckofcardsapi.com/static/img/back.png'}
+          alt="Carte"
+          style={{ cursor: "pointer", width: "50px", height: "70px" }}
         />
       )}
     </div>
