@@ -1,0 +1,22 @@
+.grille {
+    margin-top: 20px;
+  }
+  
+  .cellule {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f0f0f0;
+    font-size: 20px;
+    cursor: pointer;
+  }
+  
+  .cellule.ouverte {
+    background-color: #ccc;
+  }
+  
+  .cellule.drapeau {
+    background-color: #f00;
+    color: white;
+  }
+  

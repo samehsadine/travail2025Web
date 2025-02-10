@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "noFallthroughCasesInSwitch": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx"
+  },
+  "include": [
+    "src"
+, "Exercices_Recette_Horloge_Etudiants/formulaire - distribution", "Exercices_Recette_Horloge_Etudiants/HORLOGE/App.tsx", "broouillons_tp/Filtre.tsx", "broouillons_tp/PiecesMusicale.tsx", "broouillons_tp/PiecesTable.tsx", "broouillons_tp/Formulaire_exercices", "broouillons_tp/PanierEpicerie.tsx", "broouillons_tp/Billeterie.tsx", "broouillons_tp/PrevisionsMeteo.tsx", "broouillons_tp/Total.tsx", "SOULTIONREVISION/Boutons.tsx"  ]
+}
