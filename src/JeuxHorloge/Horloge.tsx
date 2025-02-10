@@ -1,99 +1,3 @@
-/* import React, { useEffect, useState } from "react";
-import PileHorloge from "./PileHorloge";
-import { Deck } from "./Deck";
-import { EtatApp, CarteH } from "./Types";
-import "bootstrap/dist/css/bootstrap.min.css";
-
-const Horloge: React.FC = () => {
-  const [etat, setEtat] = useState<EtatApp>({
-    piles: Array(12).fill({ cartes: [] }),
-    pileCentrale: { cartes: [] },
-    paquet: [],
-    cartesRevelees: [],
-  });
-
-  // Utilisation de useEffect pour récupérer les cartes via l'API
-  useEffect(() => {
-    const initialiserJeu = async () => {
-      const nouveauPaquet = await Deck.creerPaquet();
-      setEtat((ancienEtat) => ({ ...ancienEtat, paquet: nouveauPaquet }));
-      distribuerCartes(nouveauPaquet);
-    };
-
-    initialiserJeu();
-  }, []); // Vide le tableau de dépendances pour que cela se fasse une seule fois au démarrage
-
-  const distribuerCartes = (paquet: string[]) => {
-    const piles: { cartes: CarteH[] }[] = Array(12).fill({ cartes: [] }).map(() => ({ cartes: [] }));
-    
-    const pileCentrale: { cartes: CarteH[] } = {
-      cartes: [
-        { code: paquet[0], image: `https://deckofcardsapi.com/static/img/${paquet[0]}.png` },
-      ],
-    };
-  
-    for (let i = 1; i < paquet.length; i++) {
-      const indexPile = i % 12;
-      piles[indexPile].cartes.push({
-        code: paquet[i],
-        image: `https://deckofcardsapi.com/static/img/${paquet[i]}.png`,
-      });
-    }
-  
-    setEtat((ancienEtat) => ({
-      ...ancienEtat,
-      piles,
-      pileCentrale,  // Correcte maintenant la structure de pileCentrale
-    }));
-  };
-  
-
-  function deplacerCarte(carte: CarteH, indexPile: number) {
-    const nouvellesPilesCopy = [...etat.piles]; // Crée une copie de l'état des piles
-
-    // Vérifie que l'élément à l'index spécifié est un tableau avant de l'itérer
-    if (Array.isArray(nouvellesPilesCopy[indexPile].cartes)) {
-      nouvellesPilesCopy[indexPile].cartes = [
-        ...nouvellesPilesCopy[indexPile].cartes,
-        carte,
-      ]; // Ajoute la carte à la pile
-    } else {
-      console.error("L'élément à l'index " + indexPile + " n'est pas un tableau.");
-    }
-
-    // Met à jour l'état avec les nouvelles piles
-    setEtat((ancienEtat) => ({ ...ancienEtat, piles: nouvellesPilesCopy }));
-  }
-
-  return (
-    <div className="container text-center mt-5">
-      <h1>Clock Solitaire</h1>
-      <div className="row justify-content-center mt-4">
-        {etat.piles.map((pile, index) => (
-          <div className="col-2" key={index}>
-            <PileHorloge
-              pile={pile.cartes} // Passe des objets CarteH ici
-              indexPile={index}
-              deplacerCarte={deplacerCarte}
-              centrale={false}
-            />
-          </div>
-        ))}
-        <div className="col-2">
-          <PileHorloge
-            pile={etat.pileCentrale.cartes} // Passe des objets CarteH ici
-            indexPile={-1}
-            deplacerCarte={deplacerCarte}
-            centrale={true}
-          />
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export default Horloge;
- */
 import React, { useState, useEffect } from "react";
 import PileHorloge from "./PileHorloge";
 import { Deck } from "./Deck";
@@ -201,9 +105,7 @@ const Horloge: React.FC = () => {
   const deplacerCarte = () => {
     
     setEtat((ancienEtat) => {
-      if(ancienEtat.pileCibleIndex===-1){
-        
-   
+      
       let nouvellesPiles = [...ancienEtat.piles];
       let nouvellePileCentrale = { ...ancienEtat.pileCentrale };
   
@@ -241,9 +143,6 @@ const Horloge: React.FC = () => {
         cartesRevelees: [...ancienEtat.cartesRevelees, carteCouranteADeplacer],
         pileCibleIndex: indexPileDestination, // Enregistrer l'index de la pile cible
       };
-    }else{
-      deplacerCarteSuivante();
-    }
     });
   };
   
