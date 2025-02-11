@@ -7,7 +7,7 @@ import { CarteH, EtatPiles, EtatPaquet, EtatIndexCourant } from "./Types";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./style.css"; // Importez le fichier CSS
 
-const Horloge: React.FC = () => {
+export function Horloge () {
   const [etatPiles, setEtatPiles] = useState<EtatPiles>({
     piles: Array(13).fill(null).map(() => ({ cartes: [] })),
   });
@@ -24,12 +24,15 @@ const Horloge: React.FC = () => {
   });
 
   const [tempsEcoule, setTempsEcoule] = useState(0);
-  const [timerActif, setTimerActif] = useState(false);
+  const [timerActif, setsetTimeActif] = useState(false);
   const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null);
+  const [estTerminer, setEstTerminer] = useState(false);
+  const [message, setMessage] = useState("");
+  const [score , setScore] = useState(0);
 
   const demarrerTimer = () => {
     if (!timerActif) {
-      setTimerActif(true);
+      setsetTimeActif(true);
       const id = setInterval(() => {
         setTempsEcoule((prevTemps) => prevTemps + 1);
       }, 1000);
@@ -40,12 +43,12 @@ const Horloge: React.FC = () => {
   const arreterTimer = () => {
     if (intervalId) {
       clearInterval(intervalId);
-      setTimerActif(false);
+      setsetTimeActif(false);
     }
   };
 
   const calculerScore = () => {
-    return Math.max(0, 1000 - tempsEcoule * 10); // Score basé sur le temps
+    setScore(prevScore => prevScore + 5);
   };
 
   const formatTime = (seconds: number) => {
@@ -78,7 +81,7 @@ const Horloge: React.FC = () => {
         indexCarte++;
       }
     }
-    console.log('nouvellesPiles',nouvellesPiles);
+    console.log('nouvellesPiles', nouvellesPiles);
     let carteVisible: CarteH | null = null;
     if (nouvellesPiles[0].cartes.length > 0) {
       nouvellesPiles[0].cartes[nouvellesPiles[0].cartes.length - 1].faceVisible = true;
@@ -88,7 +91,7 @@ const Horloge: React.FC = () => {
     }
 
     const pileCibleIndex = carteVisible ? obtenirPileCorrespondante(carteVisible) : -1;
-    console.log('pileCibleIndex',pileCibleIndex);
+    console.log('pileCibleIndex', pileCibleIndex);
     setEtatPiles({ piles: nouvellesPiles });
     setEtatPaquet({ paquet: paquetMelange });
     setEtatIndexCourant({ indexCourant: 0 });
@@ -96,11 +99,17 @@ const Horloge: React.FC = () => {
   };
 
   const deplacerCarte = (indexPileCible: number) => {
+
+    if(estTerminer){
+      setMessage(`Le jeu est terminé. votre score est :${score} points `);
+      return;
+      
+    }
     console.log('deplacerCarte function start');
     if (indexPileCible === -1 || indexPileCible >= etatPiles.piles.length) return;
-console.log('debut');
-console.log('etatIndexCourant',etatIndexCourant.indexCourant);
-console.log('indexPileCible',indexPileCible);
+    console.log('debut');
+    console.log('etatIndexCourant', etatIndexCourant.indexCourant);
+    console.log('indexPileCible', indexPileCible);
     const nouvellesPiles = [...etatPiles.piles];
     const pileSource = nouvellesPiles[etatIndexCourant.indexCourant];
     const pileCible = nouvellesPiles[indexPileCible];
@@ -110,32 +119,48 @@ console.log('indexPileCible',indexPileCible);
     //const carteADeplacer = pileSource.cartes.pop()!;
     const carteADeplacer = pileSource.cartes[pileSource.cartes.length - 1]; // Récupère la dernière carte sans la retirer
     const PileCorrespondante = obtenirPileCorrespondante(carteADeplacer);
-    console.log('carteADeplacer',carteADeplacer);
-    if (!carteADeplacer.faceVisible || PileCorrespondante !== indexPileCible) return;
+    console.log('carteADeplacer', carteADeplacer);
+    if (!carteADeplacer.faceVisible || PileCorrespondante !== indexPileCible) {
+      alert("Vous ne pouvezpas deplacer la carte ici : l'index de la pile cible est incorrect. ");
+      return;
+    }
+ 
     pileSource.cartes.pop();
-    
-   
+
+
     pileCible.cartes.unshift({
       ...carteADeplacer,
       faceVisible: true,
     });
 
     if (pileCible.cartes.length > 0) {
-      pileCible.cartes[pileCible.cartes.length-1].faceVisible = true;
+      pileCible.cartes[pileCible.cartes.length - 1].faceVisible = true;
     }
 
-    const nouvelleCarteVisible = pileCible.cartes[pileCible.cartes.length-1];
+    const nouvelleCarteVisible = pileCible.cartes[pileCible.cartes.length - 1];
     const nouvellePileCibleIndex = nouvelleCarteVisible
       ? obtenirPileCorrespondante(nouvelleCarteVisible)
       : -1;
 
-      console.log('fin');
-console.log('etatIndexCourant',indexPileCible);
-console.log('nouvellePile',nouvellesPiles);
+    console.log('fin');
+    console.log('etatIndexCourant', indexPileCible);
+    console.log('nouvellePile', nouvellesPiles);
+    calculerScore();
     setEtatPiles({ piles: nouvellesPiles });
     setEtatIndexCourant({ indexCourant: indexPileCible });
+    jeuTerminer();
   };
+  const jeuTerminer = () => {
+    const nouvellesPiles = [...etatPiles.piles];
+    const pilCentral = nouvellesPiles[0];
+    for (let i = 0; i < pilCentral.cartes.length; i++) {
+      if (pilCentral.cartes[i].value !== "KING") return;
 
+    }
+    setEstTerminer(true);
+    setMessage("Partie terminée");
+    arreterTimer();
+  };
   const obtenirPileCorrespondante = (carte: CarteH) => {
     const rangs: { [key: string]: number } = {
       "2": 2, "3": 3, "4": 4, "5": 5, "6": 6, "7": 7, "8": 8, "9": 9, "10": 10,
@@ -158,19 +183,9 @@ console.log('nouvellePile',nouvellesPiles);
         <Row className="mt-4"> {/* Ajout de mt-4 pour un espacement supplémentaire */}
           <div className="timer-score-container">
             <div className="timer">Temps: {formatTime(tempsEcoule)}</div>
-            <div className="score">Score: {calculerScore()}</div>
+            <div className="score">Score: {score}</div>
           </div>
         </Row>
-
-        {/* Message de fin de jeu */}
-        {etatPiles.piles.every(pile => pile.cartes.length === 0) && (
-          <Row className="mt-4"> {/* Ajout de mt-4 pour un espacement supplémentaire */}
-            <div>
-              <h2>Félicitations ! Vous avez terminé le jeu !</h2>
-              <p>Votre score final est : {calculerScore()}</p>
-            </div>
-          </Row>
-        )}
         <Row>
           <div
             className="position-relative"
@@ -183,7 +198,7 @@ console.log('nouvellePile',nouvellesPiles);
               const y = 250 + radius * Math.sin(angle);
 
               return (
-                <div 
+                <div
                   key={index}
                   className="position-absolute"
                   style={{
@@ -199,10 +214,10 @@ console.log('nouvellePile',nouvellesPiles);
                       if (!timerActif) {
                         demarrerTimer();
                       }
-                      console.log(index,etatIndexCourant.indexCourant);
-                     // if (index === etatIndexCourant.indexCourant) {
-                        deplacerCarte(index);
-                    //  }
+                      console.log(index, etatIndexCourant.indexCourant);
+                      // if (index === etatIndexCourant.indexCourant) {
+                      deplacerCarte(index);
+                      //  }
                     }}
                     isCentrale={index === 0}
                   />
@@ -211,9 +226,10 @@ console.log('nouvellePile',nouvellesPiles);
             })}
           </div>
         </Row>
+        <Row>
+        {message && <div className="alert alert-danger mt-3"/>}
+        </Row>
       </div>
     </Container>
   );
 };
-
-export default Horloge;
