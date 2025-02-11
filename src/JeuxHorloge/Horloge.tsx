@@ -64,6 +64,7 @@ const Horloge: React.FC = () => {
   }, []);
 
   const distribuerCartes = (paquet: CarteH[]) => {
+    console.log('distribuerCartes function start');
     const paquetMelange = [...paquet].sort(() => Math.random() - 0.5);
     const nouvellesPiles = Array(13).fill(null).map(() => ({ cartes: [] as CarteH[] }));
     let indexCarte = 0;
@@ -77,7 +78,7 @@ const Horloge: React.FC = () => {
         indexCarte++;
       }
     }
-
+    console.log('nouvellesPiles',nouvellesPiles);
     let carteVisible: CarteH | null = null;
     if (nouvellesPiles[0].cartes.length > 0) {
       nouvellesPiles[0].cartes[nouvellesPiles[0].cartes.length - 1].faceVisible = true;
@@ -87,39 +88,52 @@ const Horloge: React.FC = () => {
     }
 
     const pileCibleIndex = carteVisible ? obtenirPileCorrespondante(carteVisible) : -1;
+    console.log('pileCibleIndex',pileCibleIndex);
     setEtatPiles({ piles: nouvellesPiles });
     setEtatPaquet({ paquet: paquetMelange });
-    setEtatIndexCourant({ indexCourant: pileCibleIndex });
+    setEtatIndexCourant({ indexCourant: 0 });
+    console.log('distribuerCartes function end');
   };
 
   const deplacerCarte = (indexPileCible: number) => {
+    console.log('deplacerCarte function start');
     if (indexPileCible === -1 || indexPileCible >= etatPiles.piles.length) return;
-
+console.log('debut');
+console.log('etatIndexCourant',etatIndexCourant.indexCourant);
+console.log('indexPileCible',indexPileCible);
     const nouvellesPiles = [...etatPiles.piles];
-    const pileCentrale = nouvellesPiles[0];
+    const pileSource = nouvellesPiles[etatIndexCourant.indexCourant];
     const pileCible = nouvellesPiles[indexPileCible];
 
-    if (pileCentrale.cartes.length === 0) return;
+    if (pileSource.cartes.length === 0) return;
 
-    const carteADeplacer = pileCentrale.cartes.pop()!;
-    if (!carteADeplacer.faceVisible) return;
-
+    //const carteADeplacer = pileSource.cartes.pop()!;
+    const carteADeplacer = pileSource.cartes[pileSource.cartes.length - 1]; // Récupère la dernière carte sans la retirer
+    const PileCorrespondante = obtenirPileCorrespondante(carteADeplacer);
+    console.log('carteADeplacer',carteADeplacer);
+    if (!carteADeplacer.faceVisible || PileCorrespondante !== indexPileCible) return;
+    pileSource.cartes.pop();
+    
+   
     pileCible.cartes.unshift({
       ...carteADeplacer,
       faceVisible: true,
     });
 
     if (pileCible.cartes.length > 0) {
-      pileCible.cartes[0].faceVisible = true;
+      pileCible.cartes[pileCible.cartes.length-1].faceVisible = true;
     }
 
-    const nouvelleCarteVisible = pileCible.cartes[0];
+    const nouvelleCarteVisible = pileCible.cartes[pileCible.cartes.length-1];
     const nouvellePileCibleIndex = nouvelleCarteVisible
       ? obtenirPileCorrespondante(nouvelleCarteVisible)
       : -1;
 
+      console.log('fin');
+console.log('etatIndexCourant',indexPileCible);
+console.log('nouvellePile',nouvellesPiles);
     setEtatPiles({ piles: nouvellesPiles });
-    setEtatIndexCourant({ indexCourant: nouvellePileCibleIndex });
+    setEtatIndexCourant({ indexCourant: indexPileCible });
   };
 
   const obtenirPileCorrespondante = (carte: CarteH) => {
@@ -169,7 +183,7 @@ const Horloge: React.FC = () => {
               const y = 250 + radius * Math.sin(angle);
 
               return (
-                <div
+                <div 
                   key={index}
                   className="position-absolute"
                   style={{
@@ -185,9 +199,10 @@ const Horloge: React.FC = () => {
                       if (!timerActif) {
                         demarrerTimer();
                       }
-                      if (index === etatIndexCourant.indexCourant) {
+                      console.log(index,etatIndexCourant.indexCourant);
+                     // if (index === etatIndexCourant.indexCourant) {
                         deplacerCarte(index);
-                      }
+                    //  }
                     }}
                     isCentrale={index === 0}
                   />
