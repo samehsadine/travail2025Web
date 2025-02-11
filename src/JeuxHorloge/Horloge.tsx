@@ -101,7 +101,7 @@ export function Horloge () {
   const deplacerCarte = (indexPileCible: number) => {
 
     if(estTerminer){
-      setMessage(`Le jeu est terminé. votre score est :${score} points `);
+      setMessage(`Le jeu est terminé. votre score est :${score} points. `);
       return;
       
     }
